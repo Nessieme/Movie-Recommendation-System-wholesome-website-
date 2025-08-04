@@ -1,0 +1,7 @@
+Django==2.2.1
+pandas==0.23.3
+numpy==1.14.5
+scipy==1.1.0
+google-generativeai==0.3.1
+# Removed tmdbv3api since we're using Gemini API directly
+# Removed chatterbot dependencies since we're using Gemini API directly
