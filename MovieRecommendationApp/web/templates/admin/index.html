@@ -1,0 +1,170 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static admin_urls %}
+
+{% block content %}
+{# This block populates the content area defined in the SIMPLIFIED base_site.html #}
+<div class="dashboard-wrapper"> {# This is our main custom flex container #}
+
+    {# Left Sidebar Panel #}
+    <div class="left-panel">
+        <div class="profile-card">
+            <div class="profile-avatar">AD</div>
+            <div class="profile-info">
+                <h4>Hello, Admin!</h4>
+                <p>@{{ request.user.username }}</p>
+            </div>
+        </div>
+
+        <div class="details-card">
+            <h3>Account Overview</h3>
+            <p><strong>Total Registered Users (Non-Admin):</strong> <span class="detail-value">{{ user_count }}</span></p>
+            <p><strong>Total Movies:</strong> <span class="detail-value">{{ movie_count }}</span></p>
+            <p><strong>Total Ratings:</strong> <span class="detail-value">{{ rating_count }}</span></p>
+            <p><strong>Average Rating:</strong> <span class="detail-value">{{ average_rating|floatformat:2 }} / 5.00</span></p>
+        </div>
+
+        {# Top Active Users Section #}
+        <div class="instructions-card">
+            <h3>Top Active Users</h3>
+            <ul class="rating-log-list">
+                {% if top_active_users %}
+                    {% for user_obj in top_active_users %}
+                        <li>
+                            <p><strong>User:</strong> {{ user_obj.username }}</p>
+                            <p><strong>Total Ratings:</strong> {{ user_obj.total_ratings_by_user }}</p>
+                        </li>
+                    {% empty %}
+                        <li>No active users with ratings found.</li>
+                    {% endfor %}
+                {% else %}
+                    <li>No active users data available.</li>
+                {% endif %}
+            </ul>
+        </div>
+        
+        {# Recent User Ratings Log #}
+        <div class="instructions-card">
+            <h3>Recent User Ratings Log</h3>
+            <ul class="rating-log-list">
+                {% if user_ratings_log %}
+                    {% for rating_entry in user_ratings_log %}
+                        <li>
+                            <p><strong>User:</strong> {{ rating_entry.user__username }}</p>
+                            <p><strong>Movie:</strong> {{ rating_entry.movie__title }}</p>
+                            <p><strong>Rating:</strong> {{ rating_entry.rating }} <i class="fa fa-star"></i></p>
+                        </li>
+                    {% empty %}
+                        <li>No recent ratings available.</li>
+                    {% endfor %}
+                {% else %}
+                    <li>No recent ratings data available. (Ensure `user_ratings_log` is passed from `admin.py`)</li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    {# Right Main Content Panel #}
+    <div class="right-panel">
+        <div class="greeting-section main-content-card">
+            <h2>Hello, {{ request.user.username }}! 👋</h2>
+            <p>Let's track your progress and keep up the great work!</p>
+        </div>
+
+        <div class="weekly-progress-section main-content-card">
+            <h3>Overall System Progress</h3>
+            <div class="progress-bar-container">
+                <div class="progress-fill" style="width: {{ calculated_percentage }}%;"></div>
+                <span class="progress-text">{{ calculated_percentage|floatformat:0 }}% Complete</span>
+            </div>
+            <p class="progress-description">Reflects overall system health or data completeness. (Target: {{ progress_target|default:1000 }} ratings)</p>
+        </div>
+
+        <div class="quick-actions-section main-content-card">
+            <h3>Quick Actions</h3>
+            <div class="action-buttons">
+                <a href="{% url 'admin:web_movie_add' %}" class="btn admin-btn-primary">
+                    <i class="fa fa-plus"></i> Add New Movie
+                </a>
+                <a href="{% url 'admin:web_myrating_changelist' %}" class="btn admin-btn-secondary">
+                    <i class="fa fa-bar-chart"></i> View All Ratings
+                </a>
+                <a href="{% url 'admin:movie_report' %}" class="btn admin-btn-secondary">
+                    <i class="fa fa-file-text"></i> Genre Report
+                </a>
+            </div>
+        </div>
+        
+        <div class="chart-section main-content-card">
+            <h3>Genre Distribution (Top 10)</h3>
+            <canvas id="genreChart" style="max-height: 400px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById('genreChart').getContext('2d');
+
+    const backgroundColors = [
+        '#3498db', // Blue
+        '#2ecc71', // Green
+        '#f1c40f', // Yellow
+        '#e74c3c', // Red
+        '#9b59b6', // Purple
+        '#1abc9c', // Turquoise
+        '#e67e22', // Orange
+        '#34495e', // Dark Blue
+        '#7f8c8d', // Grey
+        '#c0392b'  // Darker Red
+    ];
+
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: [
+                {% for item in top_genres %}'{{ item.genre }}'{% if not forloop.last %},{% endif %}{% endfor %}
+            ],
+            datasets: [{
+                label: '# of Movies',
+                data: [
+                    {% for item in top_genres %}{{ item.movie_count }}{% if not forloop.last %},{% endif %}{% endfor %}
+                ],
+                backgroundColor: backgroundColors,
+                borderColor: '#ffffff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'right',
+                    labels: {
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed !== null) {
+                                label += context.parsed + ' movies';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

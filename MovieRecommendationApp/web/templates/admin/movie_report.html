@@ -1,0 +1,67 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Movie Genre Report | CineSuggest{% endblock %}
+
+{% block content %}
+<style>
+    #content-main {
+        padding: 20px;
+    }
+    .report-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    .report-table th, .report-table td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+    .report-table th {
+        background-color: #f2f2f2;
+        color: #333;
+    }
+    .report-table tr:nth-child(even){background-color: #f9f9f9;}
+    .report-table tr:hover {background-color: #ddd;}
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 15px;
+        background-color: #6c757d;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+</style>
+
+<div id="content-main">
+    <h1>Movie and Rating Statistics by Genre</h1>
+    <p>This report shows the distribution of movies and ratings across different genres.</p>
+
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Genre</th>
+                <th>Number of Movies</th>
+                <th>Total Ratings Submitted</th>
+                <th>Average Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in genre_data %}
+            <tr>
+                <td>{{ item.genre }}</td>
+                <td>{{ item.movie_count }}</td>
+                <td>{{ item.total_ratings }}</td>
+                <td>{{ item.average_rating|floatformat:2 }} / 5.00</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4">No data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'admin:index' %}" class="back-link">&larr; Back to Dashboard</a>
+</div>
+{% endblock %}

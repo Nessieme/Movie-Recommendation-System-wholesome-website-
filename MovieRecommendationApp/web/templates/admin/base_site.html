@@ -1,0 +1,67 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    {# Keep Gentellela's core CSS if other admin pages rely on its styling #}
+    <link href="{% static 'admin/vendors/bootstrap/dist/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin/vendors/font-awesome/css/font-awesome.min.css' %}" rel="stylesheet">
+    <link href="{% static 'admin/build/css/custom.min.css' %}" rel="stylesheet">
+    {# NEW: Link your custom admin CSS here (must be last to override Gentellela) #}
+    <link rel="stylesheet" href="{% static 'web/css/admin_custom.css' %}">
+{% endblock %}
+
+{% block title %}{{ title }} | CineSuggest Admin{% endblock %}
+
+{% block branding %}
+    <h1 id="site-name"><a href="{% url 'admin:index' %}">CineSuggest Admin</a></h1>
+{% endblock branding %}
+
+{% block nav-global %}{% endblock %} {# Hide the default global navigation #}
+{% block nav-sidebar %}{% endblock %} {# Hide default sidebar if it appears #}
+
+
+{% block body %}
+{# We are stripping down Gentellela's layout in base_site.html to build our own in index.html #}
+<div class="main-body-wrapper"> {# Our custom wrapper for the entire page content #}
+
+    {# This custom-top-header replaces Gentellela's top_nav #}
+    <div class="custom-top-header">
+        {# Site branding will be handled by our #site-name CSS targeting branding block #}
+        <div class="header-nav-menu">
+            <nav>
+                {# This section will have your user profile dropdown #}
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="">
+                        <a href="javascript:;" class="user-profile dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                            {{ request.user.username }}
+                            <span class="fa fa-angle-down"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-usermenu pull-right">
+                            <li><a href="{% url 'admin:logout' %}"><i class="fa fa-sign-out pull-right"></i> Log Out</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    {# This is where our custom dashboard layout (defined in index.html) will be placed #}
+    {% block content %}{{ block.super }}{% endblock %}
+
+    <footer>
+        <div class="pull-right">
+            CineSuggest Admin Panel by Gemini
+        </div>
+        <div class="clearfix"></div>
+    </footer>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+    {{ block.super }}
+    {# Keep Gentellela's core JS if other admin pages rely on it #}
+    <script src="{% static 'admin/vendors/jquery/dist/jquery.min.js' %}"></script>
+    <script src="{% static 'admin/vendors/bootstrap/dist/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'admin/build/js/custom.min.js' %}"></script>
+{% endblock %}
