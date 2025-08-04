@@ -1,0 +1,117 @@
+{% extends 'web/base.html'%}
+{% load static %}
+{% load my_custom_filters %}
+{% block title %}All Movies{% endblock %}
+
+{% block body %}
+
+<div class="container-fluid" style="padding-top: 50px; padding-bottom: 30px;">
+    <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">Browse All Movies</h2>
+
+    {# Display messages from Django #}
+    {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert" style="text-align: center;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="container"> {# Added container for search bar #}
+        <div class="row">
+            <div class="col-xs-12 col-sm-6 col-sm-offset-3"> {# Adjusted columns for better responsiveness #}
+                <form class="form-horizontal" role="search" method="get" action=''>
+                    <div class="form-group">
+                        <div class="input-group">  
+                            <input type="text" class="form-control input-lg " name="q" value="{{ request.GET.q }}" placeholder= "Search Movies "/>
+                            <span class='input-group-btn'>
+                                <button class='btn btn-info btn-lg' type='submit'>Search</button>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-4"> {# Added mt-4 for margin top #}
+        <div class="row">
+            <div class="col-sm-6 col-md-3"> {# Adjusted column sizes for general info #}
+                <h1 style="font-size: 2.5em; color: #34495e;">Movies List</h1>
+            </div>
+            <div class="col-sm-6 col-md-9 text-right"> {# Adjusted column and text-right for alignment #}
+                <a href="{% url 'recommend' %}" class="btn btn-primary-custom btn-lg">Get Recommendation</a> {# Used custom button styles #}
+            </div>
+        </div>
+    </div>
+    
+    <div class="container-fluid">
+    <div class="row g-3"> {# Use g-3 for consistent gutter spacing #}
+            {% if movies %}
+                {% for movie in movies %}
+                    <div class="col-sm-6 col-md-3 col-lg-2"> {# Adjusted column sizes for grid #}
+                        <div class="movie-thumbnail-card thumbnail">
+                            <h4 class="movie-title">{{ movie.title }}</h4>
+                            <a href="{% url 'detail' movie.id %}">
+                                <img src="{{ movie.movie_logo.url }}" class="img-responsive movie-logo">
+                            </a>
+                            <h5 class="movie-genre">{{ movie.genre }}</h5>
+                            
+                            {# NEW: Average Rating and Count #}
+                            <div class="movie-ratings-summary">
+                                {% if movie.average_rating %}
+                                    <div class="star-rating-display">
+                                        {% for i in "12345" %}
+                                            {% if forloop.counter <= movie.average_rating|floatformat:"0" %}
+                                                <i class="fa fa-star star-filled"></i>
+                                            {% else %}
+                                                <i class="fa fa-star-o star-empty"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                        <span class="average-rating-value">{{ movie.average_rating|floatformat:1 }}</span>
+                                    </div>
+                                    <p class="rating-count-text">({{ movie.rating_count }} Users Rated)</p>
+                                {% else %}
+                                    <p class="no-ratings-text">No ratings yet.</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="caption">
+                                {# "Give Rating" button if not rated #}
+                                {% if request.user.is_authenticated %}
+                                    {% if movie.id not in user_personal_ratings %}
+                                        <a href="{% url 'detail' movie.id %}" class="btn btn-primary-custom btn-sm" role="button">Give Rating</a>
+                                    {% else %}
+                                        {# User has rated, show their rating and "Rate Again" option #}
+                                        <div class="user-personal-rating">
+                                            Your rating: 
+                                            {% with user_movie_rating=user_personal_ratings|get_item:movie.id %} {# FIX: Use get_item filter for dictionary lookup #}
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= user_movie_rating %} {# Use the new variable #}
+                                                        <i class="fa fa-star star-filled"></i>
+                                                    {% else %}
+                                                        <i class="fa fa-star-o star-empty"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endwith %}
+                                        </div>
+                                        <a href="{% url 'detail' movie.id %}" class="btn btn-secondary-custom btn-sm" role="button">Rate Again</a>
+                                    {% endif %}
+                                {% else %}
+                                    {# Not authenticated, just view details #}
+                                    <a href="{% url 'detail' movie.id %}" class="btn btn-info btn-sm" role="button">View Details</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="col-12 text-center text-muted">No movies found.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

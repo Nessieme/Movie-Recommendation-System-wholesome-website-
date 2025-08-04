@@ -1,0 +1,97 @@
+{% extends 'web/base.html' %}
+{% block title %}Submit Feedback{% endblock %}
+
+{% block body %}
+<style>
+    .feedback-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        /* This color now matches the chatbot overlay */
+        background-color: rgba(0, 0, 0, 0.6); 
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1050; 
+    }
+    .home-button-container {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+    .home-button-container a {
+        color: #aaa;
+        font-size: 1.5em;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .home-button-container a:hover {
+        color: #555;
+    }
+</style>
+
+<div class="feedback-overlay">
+    <div class="auth-card" style="max-width: 600px; padding: 50px; position: relative;">
+        
+        <!-- THIS IS THE NEW HOME BUTTON -->
+        <div class="home-button-container">
+            <a href="{% url 'landing_page' %}" title="Back to Home">&times;</a>
+        </div>
+        <!-- END OF NEW HOME BUTTON -->
+
+        <h2 style="margin-bottom: 20px;">We'd love some feedback! <span style="font-size: 1.2em;">😊</span></h2>
+        <p style="color: #777; margin-bottom: 40px; font-size: 1.1em;">How was your experience with CineSuggest?</p>
+
+        <form method="post" novalidate style="text-align: left;">
+            {% csrf_token %}
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 1.1em;">How would you rate your experience?</label>
+                <div class="star-rating" style="font-size: 2em; line-height: 1;">
+                    <span class="fa fa-star-o" data-rating="1" style="cursor: pointer; color: #ffc107;"></span>
+                    <span class="fa fa-star-o" data-rating="2" style="cursor: pointer; color: #ffc107;"></span>
+                    <span class="fa fa-star-o" data-rating="3" style="cursor: pointer; color: #ffc107;"></span>
+                    <span class="fa fa-star-o" data-rating="4" style="cursor: pointer; color: #ffc107;"></span>
+                    <span class="fa fa-star-o" data-rating="5" style="cursor: pointer; color: #ffc107;"></span>
+                    <input type="hidden" name="rating" class="rating-value" value="1" required>
+                </div>
+                <p class="small text-muted mt-2">1 = Poor, 5 = Excellent</p>
+            </div>
+            <div class="form-group" style="margin-bottom: 30px;">
+                <label for="{{ form.comment.id_for_label }}" style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 1.1em;">Any comments or suggestions? <span style="font-size: 1.2em;">✍️</span></label>
+                {{ form.comment }}
+            </div>
+            <button type="submit" class="btn btn-success btn-lg" style="font-size: 1.2em; padding: 15px 30px; border-radius: 10px;">Submit Feedback <span style="font-size: 1.2em;">✅</span></button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var $star_rating = document.querySelectorAll('.star-rating .fa');
+        var $rating_value = document.querySelector('.rating-value');
+
+        var SetRatingStar = function() {
+            $star_rating.forEach(function(star) {
+                if (parseInt($rating_value.value) >= parseInt(star.dataset.rating)) {
+                    star.classList.remove('fa-star-o');
+                    star.classList.add('fa-star');
+                } else {
+                    star.classList.remove('fa-star');
+                    star.classList.add('fa-star-o');
+                }
+            });
+        };
+
+        $star_rating.forEach(function(star) {
+            star.addEventListener('click', function() {
+                $rating_value.value = this.dataset.rating;
+                SetRatingStar();
+            });
+        });
+
+        SetRatingStar(); // Initialize rating on page load
+    });
+</script>
+{% endblock %}

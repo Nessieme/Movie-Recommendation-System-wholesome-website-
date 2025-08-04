@@ -1,0 +1,171 @@
+{% extends 'web/base.html' %}
+{% load static %} {# Make sure to load static here for images directly in HTML #}
+
+{% block title %}Your Next Favorite Movie{% endblock %}
+
+{% block body %}
+<section class="hero-section">
+    <div class="hero-content">
+        <h1>CineSuggest: Your Next Cinematic Journey Awaits</h1>
+        <p class="lead">Discover personalized movie recommendations powered by AI, tailored just for you. Join the adventure!</p>
+        <div class="hero-buttons">
+            <a href="{% url 'login' %}" class="btn btn-primary-custom btn-lg">Log In / Sign Up</a>
+            <a href="{% url 'movie_list' %}" class="btn btn-secondary-custom btn-lg">Browse All Movies</a>
+        </div>
+    </div>
+</section>
+
+{# REVISED: About CineSuggest Section #}
+<section class="about-cinesuggest-section py-5">
+    <div class="container">
+        <div class="about-cinesuggest-card">
+            <div class="row align-items-center">
+                <div class="col-md-6 order-md-2 mb-4 mb-md-0">
+                    {# Using local static image path #}
+                    <img src="{% static 'web/img/about_cinesuggest.jpg' %}" alt="About CineSuggest" class="img-fluid rounded shadow-lg">
+                </div>
+                <div class="col-md-6 order-md-1">
+                    <h2 class="text-start">About CineSuggest</h2>
+                    <p class="text-muted">CineSuggest is an AI-integrated movie recommendation system built with the Django framework. It blends intelligent suggestions using Collaborative Filtering (SVD-based Matrix Factorization) with a manual recommendation interface that allows users to explore and recommend movies by searching genres or titles. Designed for both functionality and user engagement, it provides a seamless, Netflix-style experience.</p>
+                    <h3 class="text-start">Core Features:</h3>
+                    <ul class="feature-list">
+                        <li><i class="fa fa-lock feature-icon"></i> <span><strong>User & Admin Authentication</strong> – Role-based secure access.</span></li>
+                        <li><i class="fa fa-bullseye feature-icon"></i> <span><strong>Collaborative Filtering</strong> – Personalized recommendations based on user behavior.</span></li>
+                        <li><i class="fa fa-search feature-icon"></i> <span><strong>Manual Recommendation System</strong> – Users can explore by genre or search bar and manually recommend movies.</span></li>
+                        <li><i class="fa fa-comments feature-icon"></i> <span><strong>Chatbot Support</strong> – In-app chatbot assists users with navigation, queries, and personalized movie suggestions.</span></li>
+                        <li><i class="fa fa-star feature-icon"></i> <span><strong>Feedback Module</strong> – Users can rate, review, and send feedback to improve recommendation quality.</span></li>
+                        <li><i class="fa fa-dashboard feature-icon"></i> <span><strong>Admin Dashboard</strong> – Tracks users, recommendations, trends, and feedback reports.</span></li>
+                        <li><i class="fa fa-mobile feature-icon"></i> <span><strong>Responsive UI/UX</strong> – Dark theme, hover effects, genre filters, and modals for login/signup.</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{# NEW: Gossip Town Section #}
+<section class="gossip-town-section py-5">
+    <div class="container">
+        <h2 class="text-center">Gossip Town: What's Buzzing in the Movie World?</h2>
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="gossip-card">
+                    {# Using local static image path #}
+                    <img src="{% static 'web/img/gossip_reddit.jpg' %}" alt="Movie Set News" class="img-fluid rounded-top gossip-img">
+                    <div class="gossip-content">
+                        <h4>Reddit's Latest Fan Theories</h4>
+                        <p class="text-muted">Dive deep into speculative discussions and hidden meanings from your favorite film communities.</p>
+                        <a href="https://www.reddit.com/r/FanTheories/" target="_blank" class="gossip-link">Read on Reddit <i class="fa fa-external-link-square"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="gossip-card">
+                    {# Using local static image path #}
+                    <img src="{% static 'web/img/gossip_twitter.jpg' %}" alt="Film Festival Buzz" class="img-fluid rounded-top gossip-img">
+                    <div class="gossip-content">
+                        <h4>Twitter Trends: #OscarsSnubs</h4>
+                        <p class="text-muted">See what's trending and join the conversation about award season controversies.</p>
+                        <a href="https://twitter.com/search?q=%23OscarsSnubs" target="_blank" class="gossip-link">See on Twitter <i class="fa fa-external-link-square"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="gossip-card">
+                    {# Using local static image path #}
+                    <img src="{% static 'web/img/gossip_imdb.jpg' %}" alt="Movie Premiere Reactions" class="img-fluid rounded-top gossip-img">
+                    <div class="gossip-content">
+                        <h4>IMDb Discussions: New Releases</h4>
+                        <p class="text-muted">Check out user reviews and active forum discussions on the latest blockbusters.</p>
+                        <a href="https://www.imdb.com/title/tt0468569/boards/" target="_blank" class="gossip-link">Explore IMDb <i class="fa fa-external-link-square"></i></a>
+                    </div>
+                </div>
+            </div>
+             <div class="col-md-6 col-lg-4">
+                <div class="gossip-card">
+                    {# Using local static image path #}
+                    <img src="{% static 'web/img/gossip_classic_film.jpg' %}" alt="Classic Film Forum" class="img-fluid rounded-top gossip-img">
+                    <div class="gossip-content">
+                        <h4>Classic Film Forums: Hidden Gems</h4>
+                        <p class="text-muted">Discover forgotten masterpieces and participate in discussions about cinema history.</p>
+                        <a href="https://www.criterionforum.org/" target="_blank" class="gossip-link">Visit Forum <i class="fa fa-external-link-square"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="gossip-card">
+                    {# Using local static image path #}
+                    <img src="{% static 'web/img/gossip_podcast.jpg' %}" alt="Podcast Discussions" class="img-fluid rounded-top gossip-img">
+                    <div class="gossip-content">
+                        <h4>Film Podcast Episode Discussions</h4>
+                        <p class="text-muted">Listen to experts and fans break down movies and industry news.</p>
+                        <a href="https://podcasts.google.com/?q=movie%20reviews" target="_blank" class="gossip-link">Find Podcasts <i class="fa fa-external-link-square"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="gossip-card">
+                    {# Using local static image path #}
+                    <img src="{% static 'web/img/gossip_streaming.jpg' %}" alt="Streaming Service Updates" class="img-fluid rounded-top gossip-img">
+                    <div class="gossip-content">
+                        <h4>Netflix/Prime New Releases Chat</h4>
+                        <p class="text-muted">Stay updated on what's new and what's leaving your favorite streaming platforms.</p>
+                        <a href="https://www.reddit.com/r/netflix/" target="_blank" class="gossip-link">Join the Chat <i class="fa fa-external-link-square"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="action-section py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready for Your Next Obsession?</h2>
+        {% if user.is_authenticated %}
+            <a href="{% url 'recommend' %}" class="btn btn-cta-main btn-lg">
+                <i class="fa fa-film me-2"></i> Get Personalized Recommendations
+            </a>
+        {% else %}
+            <p class="lead mb-4">Log in or sign up to unlock your tailored movie suggestions.</p>
+            <a href="{% url 'login' %}" class="btn btn-primary-custom btn-lg">Log In / Sign Up to Start</a>
+        {% endif %}
+    </div>
+</section>
+
+{% if feedbacks %}
+<section class="testimonials-section py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Hear From Our Movie Buffs!</h2>
+        <div class="row g-4">
+            {% for feedback in feedbacks %}
+            <div class="col-md-6 col-lg-4">
+                <div class="testimonial-card">
+                    <div class="testimonial-header">
+                        <div class="user-avatar">
+                            <i class="fa fa-user-circle-o"></i> 
+                        </div>
+                        <div class="user-info">
+                            <h5 class="author">{{ feedback.user.username }}</h5>
+                            <div class="testimonial-rating">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= feedback.rating %}
+                                        <i class="fa fa-star star-filled"></i>
+                                    {% else %}
+                                        <i class="fa fa-star-o star-empty"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <p class="quote">"{{ feedback.comment }}"</p>
+                    <div class="testimonial-footer">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% endblock %}

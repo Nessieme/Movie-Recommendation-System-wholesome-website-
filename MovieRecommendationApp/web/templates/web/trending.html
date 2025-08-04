@@ -1,0 +1,393 @@
+{% extends 'web/base.html'%}
+{% load static %}
+
+{% block title %}Trending Movies{% endblock %}
+
+{% block body %}
+<div class="container-fluid" style="padding-top: 50px; padding-bottom: 30px;">
+    <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">Trending Movies</h2>
+
+    {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert" style="text-align: center;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <!-- Left Sidebar for Watchlist -->
+        <div class="col-md-3">
+            <div class="watchlist-sidebar main-content-card">
+                <h3 style="margin-top: 0; color: #34495e; margin-bottom: 25px;">Your Watchlist</h3>
+                
+                {% if watchlist %}
+                    <div class="watchlist-items">
+                        {% for item in watchlist %}
+                            <div class="watchlist-item" id="watchlist-item-{{ item.movie_id }}">
+                                <div class="d-flex align-items-center mb-2">
+                                    {% if item.poster_path %}
+                                        <img src="https://image.tmdb.org/t/p/w92{{ item.poster_path }}" alt="{{ item.movie_title }}" class="watchlist-thumbnail me-2">
+                                    {% else %}
+                                        <div class="watchlist-thumbnail-placeholder me-2">No Image</div>
+                                    {% endif %}
+                                    <div>
+                                        <h5 class="mb-0">{{ item.movie_title }}</h5>
+                                        <small class="text-muted">Added {{ item.added_at|date:"M d, Y H:i" }}</small>
+                                    </div>
+                                </div>
+                                <button class="btn btn-sm btn-danger remove-from-watchlist" data-movie-id="{{ item.movie_id }}">
+                                    <i class="fa fa-trash"></i> Remove
+                                </button>
+                                <hr>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted">Your watchlist is empty. Add movies by clicking the "Add to Watchlist" button on any movie.</p>
+                {% endif %}
+            </div>
+
+            <!-- API Key Form -->
+            <div class="api-key-form main-content-card mt-4">
+                <h3 style="margin-top: 0; color: #34495e; margin-bottom: 25px;">API Settings</h3>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="{{ form.youtube_api_key.id_for_label }}">{{ form.youtube_api_key.label }}</label>
+                        {{ form.youtube_api_key }}
+                        <small class="form-text text-muted">{{ form.youtube_api_key.help_text }}</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom btn-block mt-4">Save API Keys</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="col-md-9">
+            <!-- Trending Movies Section -->
+            <div class="trending-movies-section main-content-card mb-4">
+                <h3 style="margin-top: 0; color: #34495e; margin-bottom: 25px;">This Week's Trending Movies</h3>
+                
+                {% if trending_movies %}
+                    <div class="row g-3">
+                        {% for movie in trending_movies %}
+                            <div class="col-sm-6 col-md-4 col-lg-3">
+                                <div class="movie-thumbnail-card thumbnail">
+                                    <h4 class="movie-title">{{ movie.title }}</h4>
+                                    <div class="position-relative">
+                                        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" class="img-responsive movie-logo">
+                                        <div class="movie-thumbnail-overlay">
+                                            <button class="btn btn-sm btn-success add-to-watchlist" 
+                                                    data-movie-id="{{ movie.id }}" 
+                                                    data-movie-title="{{ movie.title }}" 
+                                                    data-poster-path="{{ movie.poster_path }}">
+                                                <i class="fa fa-plus"></i> Add to Watchlist
+                                            </button>
+                                            <button class="btn btn-sm btn-info watch-trailer" 
+                                                    data-movie-title="{{ movie.title }} trailer" 
+                                                    data-youtube-key="{{ youtube_api_key }}">
+                                                <i class="fa fa-play"></i> Watch Trailer
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="movie-info">
+                                        <div class="star-rating-display">
+                                            {% with vote_average=movie.vote_average|floatformat:"0"|add:"0" %}
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= vote_average %}
+                                                        <i class="fa fa-star star-filled"></i>
+                                                    {% else %}
+                                                        <i class="fa fa-star-o star-empty"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endwith %}
+                                            <span class="average-rating-value">{{ movie.vote_average|floatformat:1 }}</span>
+                                        </div>
+                                        <p class="release-date">Released: {{ movie.release_date }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <p>No trending movies available. Please try again later.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Watchlist Recommendations Section -->
+            {% if watchlist_recommendations %}
+                <div class="watchlist-recommendations-section main-content-card">
+                    <h3 style="margin-top: 0; color: #34495e; margin-bottom: 25px;">
+                        Because You Added "{{ watchlist.first.movie_title }}"
+                    </h3>
+                    
+                    <div class="row g-3">
+                        {% for movie in watchlist_recommendations %}
+                            <div class="col-sm-6 col-md-4 col-lg-3">
+                                <div class="movie-thumbnail-card thumbnail">
+                                    <h4 class="movie-title">{{ movie.title }}</h4>
+                                    <div class="position-relative">
+                                        <img src="https://image.tmdb.org/t/p/w500{{ movie.poster_path }}" class="img-responsive movie-logo">
+                                        <div class="movie-thumbnail-overlay">
+                                            <button class="btn btn-sm btn-success add-to-watchlist" 
+                                                    data-movie-id="{{ movie.id }}" 
+                                                    data-movie-title="{{ movie.title }}" 
+                                                    data-poster-path="{{ movie.poster_path }}">
+                                                <i class="fa fa-plus"></i> Add to Watchlist
+                                            </button>
+                                            <button class="btn btn-sm btn-info watch-trailer" 
+                                                    data-movie-title="{{ movie.title }} trailer" 
+                                                    data-youtube-key="{{ youtube_api_key }}">
+                                                <i class="fa fa-play"></i> Watch Trailer
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="movie-info">
+                                        <div class="star-rating-display">
+                                            {% with vote_average=movie.vote_average|floatformat:"0"|add:"0" %}
+                                                {% for i in "12345" %}
+                                                    {% if forloop.counter <= vote_average %}
+                                                        <i class="fa fa-star star-filled"></i>
+                                                    {% else %}
+                                                        <i class="fa fa-star-o star-empty"></i>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endwith %}
+                                            <span class="average-rating-value">{{ movie.vote_average|floatformat:1 }}</span>
+                                        </div>
+                                        <p class="release-date">Released: {{ movie.release_date }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Trailer Modal -->
+<div class="modal fade" id="trailerModal" tabindex="-1" role="dialog" aria-labelledby="trailerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="trailerModalLabel">Movie Trailer</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="youtube-player"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add CSS for movie thumbnails and overlay -->
+<style>
+    .movie-thumbnail-card {
+        position: relative;
+        transition: transform 0.3s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .movie-thumbnail-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .movie-logo {
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+    }
+    
+    .movie-thumbnail-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        opacity: 0;
+        transition: opacity 0.3s;
+        border-radius: 4px;
+    }
+    
+    .movie-thumbnail-card:hover .movie-thumbnail-overlay {
+        opacity: 1;
+    }
+    
+    .movie-thumbnail-overlay button {
+        margin: 5px;
+        width: 80%;
+    }
+    
+    .movie-info {
+        padding: 10px 0;
+    }
+    
+    .watchlist-thumbnail {
+        width: 45px;
+        height: 68px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+    
+    .watchlist-thumbnail-placeholder {
+        width: 45px;
+        height: 68px;
+        background-color: #eee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        color: #999;
+        border-radius: 4px;
+    }
+    
+    .watchlist-item {
+        margin-bottom: 15px;
+    }
+    
+    .main-content-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        padding: 25px;
+        margin-bottom: 30px;
+    }
+</style>
+
+<!-- JavaScript for watchlist and trailer functionality -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add to Watchlist functionality
+        document.querySelectorAll('.add-to-watchlist').forEach(button => {
+            button.addEventListener('click', function() {
+                const movieId = this.getAttribute('data-movie-id');
+                const movieTitle = this.getAttribute('data-movie-title');
+                const posterPath = this.getAttribute('data-poster-path');
+                
+                const formData = new FormData();
+                formData.append('movie_id', movieId);
+                formData.append('movie_title', movieTitle);
+                formData.append('poster_path', posterPath);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                
+                fetch('{% url "add_to_watchlist" %}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Added to watchlist!');
+                        // Reload the page to update the watchlist
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        });
+        
+        // Remove from Watchlist functionality
+        document.querySelectorAll('.remove-from-watchlist').forEach(button => {
+            button.addEventListener('click', function() {
+                const movieId = this.getAttribute('data-movie-id');
+                
+                const formData = new FormData();
+                formData.append('movie_id', movieId);
+                formData.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+                
+                fetch('{% url "remove_from_watchlist" %}', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Remove the item from the DOM
+                        document.getElementById('watchlist-item-' + movieId).remove();
+                        alert('Removed from watchlist!');
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+            });
+        });
+        
+        // Watch Trailer functionality
+        document.querySelectorAll('.watch-trailer').forEach(button => {
+            button.addEventListener('click', function() {
+                const movieTitle = this.getAttribute('data-movie-title');
+                const youtubeKey = this.getAttribute('data-youtube-key');
+                
+                if (!youtubeKey) {
+                    alert('YouTube API key is required to watch trailers. Please add your API key in the settings.');
+                    return;
+                }
+                
+                // Search for the trailer on YouTube
+                fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(movieTitle)}&key=${youtubeKey}&maxResults=1&type=video`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.items && data.items.length > 0) {
+                        const videoId = data.items[0].id.videoId;
+                        
+                        // Create YouTube embed
+                        const iframe = document.createElement('iframe');
+                        iframe.width = '100%';
+                        iframe.height = '400';
+                        iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                        iframe.frameBorder = '0';
+                        iframe.allowFullscreen = true;
+                        
+                        // Update modal title and content
+                        document.getElementById('trailerModalLabel').textContent = movieTitle;
+                        const playerDiv = document.getElementById('youtube-player');
+                        playerDiv.innerHTML = '';
+                        playerDiv.appendChild(iframe);
+                        
+                        // Show the modal
+                        $('#trailerModal').modal('show');
+                    } else {
+                        alert('No trailer found for this movie.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while fetching the trailer. Please try again.');
+                });
+            });
+        });
+        
+        // Clean up YouTube player when modal is closed
+        $('#trailerModal').on('hidden.bs.modal', function () {
+            document.getElementById('youtube-player').innerHTML = '';
+        });
+    });
+</script>
+{% endblock %}

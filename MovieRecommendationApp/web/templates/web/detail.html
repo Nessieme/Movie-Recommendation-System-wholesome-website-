@@ -1,0 +1,90 @@
+{% extends 'web/base.html'%}
+{% block title %}{{ movies.title }}{% endblock %}
+{% load static %}
+
+{% block body %}
+
+<div class="container-fluid" style="padding-top: 50px; padding-bottom: 30px;">
+    <h2 style="text-align: center; color: #2c3e50; margin-bottom: 30px;">{{ movies.title }}</h2>
+
+    {% if messages %}
+        <div class="messages mb-4">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}" role="alert" style="text-align: center;">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-md-4 text-center">
+            <img src="{{ movies.movie_logo.url }}" class="img-responsive rounded shadow-lg" style="max-width: 100%; height: auto; margin: 0 auto 20px;">
+        </div>
+        <div class="col-md-8">
+            <h3 style="color: #34495e;">Movie Details</h3>
+            <p><strong>Genre:</strong> {{ movies.genre }}</p>
+            <p><strong>Description:</strong> {{ movies.description }}</p>
+            
+            {# NEW: Overall Movie Rating Summary on Detail Page #}
+            {% if movie_with_stats %}
+                <div class="overall-movie-rating-summary mb-3">
+                    <p><strong>Overall Average Rating:</strong>
+                        {% if movie_with_stats.average_rating %}
+                            <div class="star-rating-display d-inline-block ms-2">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= movie_with_stats.average_rating|floatformat:"0" %}
+                                        <i class="fa fa-star star-filled"></i>
+                                    {% else %}
+                                        <i class="fa fa-star-o star-empty"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="average-rating-value ms-1">{{ movie_with_stats.average_rating|floatformat:1 }}</span>
+                            </div>
+                            <span class="rating-count-text ms-2">({{ movie_with_stats.rating_count }} Users Rated)</span>
+                        {% else %}
+                            <span class="ms-2 no-ratings-text">No ratings yet.</span>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endif %}
+
+            <h3 style="color: #34495e; margin-top: 20px;">Your Rating</h3>
+            {% if request.user.is_authenticated %}
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="ratingInput">Select your rating (1-5):</label>
+                        <input type="range" class="form-control-range" id="ratingInput" name="rating" min="1" max="5" value="{{ personal_rating|default:3 }}" oninput="this.nextElementSibling.value = this.value">
+                        <output>{{ personal_rating|default:3 }}</output>
+                    </div>
+                    <button type="submit" class="btn btn-primary-custom mt-3">
+                        {% if personal_rating %}
+                            Rate Again
+                        {% else %}
+                            Give Rating
+                        {% endif %}
+                    </button>
+                </form>
+                {% if personal_rating %}
+                    <div class="personal-rating-display mt-3">
+                        Your current rating: 
+                        {% for i in "12345" %}
+                            {% if forloop.counter <= personal_rating %}
+                                <i class="fa fa-star star-filled"></i>
+                            {% else %}
+                                <i class="fa fa-star-o star-empty"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="mt-3 text-muted">You haven't rated this movie yet.</p>
+                {% endif %}
+            {% else %}
+                <p>Please <a href="{% url 'login' %}">log in</a> to rate this movie.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
