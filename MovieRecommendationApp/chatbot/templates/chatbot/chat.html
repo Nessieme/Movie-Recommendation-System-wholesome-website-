@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CineSuggest Chat</title>
+    {% load static %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css'>
+    <style>
+        /* General Styles */
+        body, html {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            height: 100%;
+        }
+
+        /* --- THIS IS THE NEW OVERLAY STYLE --- */
+        .chat-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent grey background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        /* --- MODIFIED LAYOUT FOR CENTERING --- */
+        .chat-layout {
+            display: flex;
+            height: 85vh;
+            max-height: 700px;
+            width: 90vw;
+            max-width: 900px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Sidebar Styles */
+        .chat-sidebar {
+            width: 280px;
+            background: #fff;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar-header { padding: 15px; border-bottom: 1px solid #e0e0e0; text-align: center; }
+        .new-convo-btn, .home-btn {
+            width: 100%; padding: 12px; background: #007bff; color: white;
+            border: none; border-radius: 8px; font-size: 1em; cursor: pointer;
+            text-decoration: none; display: block; margin-bottom: 10px; transition: background 0.2s;
+        }
+        .home-btn { background: #6c757d; }
+        .new-convo-btn:hover { background: #0056b3; }
+        .home-btn:hover { background: #5a6268; }
+        .conversation-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; flex-grow: 1; }
+        .conversation-list a {
+            display: block; padding: 15px; border-bottom: 1px solid #eee;
+            text-decoration: none; color: #333; transition: background 0.2s;
+        }
+        .conversation-list a:hover { background: #f5f5f5; }
+        .conversation-list .active a { background: #e9f5ff; font-weight: bold; color: #007bff; }
+        
+        /* Main Chat Window */
+        .chat-main { flex-grow: 1; display: flex; flex-direction: column; background: #fff; }
+        .chat-header {
+            padding: 15px 20px; border-bottom: 1px solid #e0e0e0;
+            font-size: 1.2em; color: #555;
+        }
+        .chat-box { flex-grow: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* Message Styles */
+        .chat-message { display: flex; align-items: flex-start; max-width: 80%; }
+        .avatar {
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2em; color: white; margin-right: 15px;
+        }
+        .bot-avatar { background: #007bff; }
+        .user-avatar { background: #6c757d; }
+        .message-content {
+            padding: 12px 18px; border-radius: 18px; line-height: 1.5;
+        }
+        .bot-message .message-content { background: #f1f3f5; color: #333; border-top-left-radius: 5px; }
+        .user-message { align-self: flex-end; flex-direction: row-reverse; }
+        .user-message .avatar { margin-left: 15px; margin-right: 0; }
+        .user-message .message-content { background: #007bff; color: white; border-top-right-radius: 5px; }
+        
+        /* Input Form */
+        .chat-input-form { display: flex; padding: 15px; border-top: 1px solid #e0e0e0; }
+        #user-input {
+            flex-grow: 1; border: 1px solid #ccc; border-radius: 20px;
+            padding: 12px 20px; font-size: 1em; outline: none;
+        }
+        #send-btn {
+            background: #007bff; color: white; border: none; border-radius: 50%;
+            width: 48px; height: 48px; margin-left: 10px; cursor: pointer; font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat-overlay">
+    <div class="chat-layout">
+        <div class="chat-sidebar">
+            <div class="sidebar-header">
+                <a href="{% url 'new_chat' %}" class="new-convo-btn">+ New Conversation</a>
+                <a href="{% url 'landing_page' %}" class="home-btn">Home</a>
+            </div>
+            <ul class="conversation-list">
+                {% for session in chat_sessions %}
+                    <li class="{% if session.id == active_session.id %}active{% endif %}">
+                        <a href="{% url 'chat_session' session.id %}">
+                            Conversation on {{ session.start_time|date:"M d, Y" }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="chat-main">
+            <div class="chat-header">
+                Conversation started on {{ active_session.start_time|date:"F d, Y, P" }}
+            </div>
+            <div class="chat-box" id="chat-box">
+                {% for msg in messages %}
+                    {% if msg.is_user %}
+                    <div class="chat-message user-message">
+                        <div class="message-content">{{ msg.message_text }}</div>
+                        <div class="avatar user-avatar"><i class="fa fa-user"></i></div>
+                    </div>
+                    {% else %}
+                    <div class="chat-message bot-message">
+                        <div class="avatar bot-avatar"><i class="fa fa-android"></i></div>
+                        <div class="message-content">{{ msg.message_text }}</div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <form class="chat-input-form" id="chat-form">
+                {% csrf_token %}
+                <input type="hidden" name="session_id" value="{{ active_session.id }}">
+                <input type="text" id="user-input" placeholder="Ask a follow-up question..." autocomplete="off">
+                <button id="send-btn" type="submit">&#10148;</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{% static 'chatbot/js/chat.js' %}"></script>
+</body>
+</html>
