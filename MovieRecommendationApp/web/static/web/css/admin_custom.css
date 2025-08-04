@@ -1,0 +1,452 @@
+/* Custom Admin Panel Styles (admin_custom.css) */
+
+/* General Body & Django Admin Elements Overrides */
+body {
+    font-family: 'Open Sans', sans-serif;
+    background-color: #f0f2f5; /* Light background for admin panel */
+    color: #333;
+}
+
+/* Hide default Django admin elements if they conflict with the new layout */
+#content-related { display: none !important; }
+#changelist-filter { margin-right: 0 !important; }
+
+/* Hide Gentellela's default sidebar elements if still showing after block override */
+body.nav-md .left_col .left_col.scroll-view > .navbar.nav_title,
+body.nav-md .left_col .left_col.scroll-view > .clearfix,
+body.nav-md .left_col .profile.clearfix,
+body.nav-md .left_col #sidebar-menu.main_menu_side {
+    display: none !important;
+}
+
+/* Primary Wrapper for our entirely custom layout (from base_site.html) */
+.main-body-wrapper {
+    display: flex;
+    flex-direction: column; /* Stack header, content, footer */
+    min-height: 100vh; /* Full viewport height */
+    width: 100%;
+    max-width: none; /* Remove any max-width */
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* Prevent horizontal scroll from overflow */
+}
+
+/* Custom Header Bar (replacing top_nav from Gentellela in base_site.html) */
+.custom-top-header {
+    background-color: #1a2a3a !important; /* Dark blue-grey primary color */
+    border-bottom: 1px solid #0f1a25;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Align user tools to the right */
+    padding: 0 20px;
+    flex-shrink: 0; /* Don't shrink */
+}
+/* Style for site name/branding in custom header */
+#site-name { /* Target the H1 from branding block in base_site.html */
+    color: #f39c12 !important; /* Vibrant orange/gold for brand */
+    font-weight: 800;
+    font-size: 1.8em;
+    letter-spacing: 0.5px;
+    margin: 0;
+    position: absolute; /* Position absolutely to always be on left */
+    left: 20px;
+}
+#site-name a {
+    color: inherit;
+    text-decoration: none;
+}
+#site-name a:hover {
+    color: #e67e22; /* Darker orange on hover */
+}
+
+
+.header-nav-menu .navbar-nav {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.header-nav-menu .navbar-nav > li > a {
+    color: #ecf0f1;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 10px 15px;
+    transition: color 0.3s ease;
+}
+.header-nav-menu .navbar-nav > li > a:hover {
+    color: #f39c12;
+}
+.header-nav-menu .navbar-nav .fa-angle-down {
+    margin-left: 5px;
+}
+/* User profile dropdown - basic styling if Gentellela's JS doesn't fully style it */
+.header-nav-menu .user-profile.dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+}
+.header-nav-menu .dropdown-menu {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    min-width: 160px;
+    padding: 10px 0;
+}
+.header-nav-menu .dropdown-menu li a {
+    color: #333;
+    padding: 8px 20px;
+    display: block;
+    text-decoration: none;
+}
+.header-nav-menu .dropdown-menu li a:hover {
+    background-color: #f8f8f8;
+    color: #2c3e50;
+}
+.header-nav-menu .dropdown-menu li .fa-sign-out {
+    margin-right: 8px;
+}
+
+
+
+/* Main Content Area (Layout for Dashboard itself) */
+.dashboard-wrapper {
+    display: flex;
+    flex-direction: row; /* Sidebar and main content in a row */
+    flex-grow: 1; /* Allows this wrapper to take available vertical space */
+    padding-top: 20px;
+    padding-bottom: 20px;
+    gap: 20px; /* Space between sidebar and main content */
+    background-color: #f0f2f5; /* Background for the main content area */
+}
+
+/* Left Sidebar Panel */
+.left-panel {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    padding: 30px 20px;
+    margin-left: 20px; /* Space from left edge of browser */
+    flex-basis: 300px; /* Fixed width for the sidebar */
+    flex-shrink: 0; /* Prevent shrinking */
+    height: fit-content; /* Adjust height to content */
+    position: sticky; /* Make it sticky */
+    top: 20px; /* Stick it 20px from the top of the viewport */
+    overflow-y: auto; /* Allow scrolling within our custom panel if content is long */
+    max-height: calc(100vh - 40px); /* Limit height to viewport height minus margin/padding */
+}
+
+/* Right Main Content Panel */
+.right-panel {
+    flex-grow: 1; /* Takes up remaining horizontal space */
+    padding-right: 20px; /* Space from right edge of browser */
+    background-color: transparent; /* No background, cards inside will have it */
+}
+
+/* General card styling (for elements within left/right panels) */
+.profile-card, .details-card, .instructions-card, .greeting-section, .main-content-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    padding: 30px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+/* Remove bottom margin for the very last card if it's the last element */
+.dashboard-main-content > .main-content-card:last-child {
+    margin-bottom: 0;
+}
+.left-panel > .instructions-card:last-child,
+.left-panel > .details-card:last-child {
+    margin-bottom: 0;
+}
+
+/* Styling for specific dashboard elements */
+.profile-card {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee; /* Separator line */
+    box-shadow: none; /* No shadow for profile card as it's within left-panel */
+    border: none; /* No border for profile card */
+    border-radius: 0; /* No border radius */
+    padding-top: 0; /* No top padding for profile card */
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.profile-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #3498db;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.8em;
+    font-weight: 600;
+    margin-right: 15px;
+    flex-shrink: 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.profile-info h4 {
+    font-size: 1.2em;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.profile-info p {
+    font-size: 0.9em;
+    color: #7f8c8d;
+}
+
+.details-card h3, .instructions-card h3 {
+    font-size: 1.3em;
+    color: #34495e;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ecf0f1;
+    padding-bottom: 10px;
+}
+
+.details-card p {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.details-card .detail-value {
+    font-weight: 700;
+    color: #3498db;
+}
+
+.rating-log-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.rating-log-list li {
+    background-color: #fff;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.rating-log-list li:last-child {
+    margin-bottom: 0;
+}
+
+.rating-log-list li p {
+    margin: 0 0 5px 0;
+    font-size: 0.95em;
+    color: #444;
+}
+
+.rating-log-list li p strong {
+    color: #2c3e50;
+}
+
+.rating-log-list li .fa-star {
+    color: #f1c40f;
+    margin-left: 5px;
+}
+
+.greeting-section h2 {
+    font-size: 2.5em;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+.greeting-section p {
+    font-size: 1.1em;
+    color: #555;
+    text-align: left;
+}
+
+.quick-actions-section h3, .chart-section h3, .weekly-progress-section h3 {
+    margin-bottom: 25px;
+    font-size: 1.8em;
+    color: #2c3e50;
+    text-align: center;
+}
+
+.action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+.admin-btn-primary, .admin-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    padding: 12px 25px;
+    font-size: 1.1em;
+    font-weight: 600;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin: 0;
+}
+
+.admin-btn-primary:hover {
+    background-color: #217dbb;
+    border-color: #217dbb;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+
+.admin-btn-secondary {
+    background-color: transparent;
+    color: #555;
+    border: 1px solid #bdc3c7;
+}
+
+.admin-btn-secondary:hover {
+    background-color: #ecf0f1;
+    border-color: #95a5a6;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.admin-btn-primary i, .admin-btn-secondary i {
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.weekly-progress-section {
+    padding-bottom: 40px;
+}
+.weekly-progress-section h3 {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.progress-bar-container {
+    background-color: #e0e0e0;
+    border-radius: 10px;
+    height: 25px;
+    overflow: hidden;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #2ecc71;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.progress-text {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #333;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.progress-description {
+    font-size: 0.9em;
+    color: #7f8c8d;
+    text-align: left;
+}
+
+/* Chart Section */
+.chart-section h3 {
+    text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) { /* Tablets */
+    .container.body > .main_container {
+        flex-direction: column !important; /* Stack panels vertically */
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        margin-top: 0 !important;
+        gap: 20px !important;
+    }
+    .container.body .col-md-3.left_col {
+        flex-basis: auto !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        position: static !important;
+        top: auto !important;
+    }
+    .left-panel {
+        margin-left: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        padding: 20px 15px !important;
+    }
+    .container.body .col-md-9.right_col, .container.body .right_col {
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    .greeting-section h2, .greeting-section p {
+        text-align: center;
+    }
+    .weekly-progress-section h3 {
+        text-align: center;
+    }
+    .progress-text {
+        left: 50%;
+        transform: translate(-50%, -50%);
+    }
+    .action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    .admin-btn-primary, .admin-btn-secondary {
+        width: 80%;
+        max-width: 250px;
+    }
+}
+
+@media (max-width: 576px) { /* Smaller phones */
+    .left-panel, .main-content-card {
+        padding: 20px 15px !important;
+    }
+    .profile-card {
+        flex-direction: column;
+        text-align: center;
+    }
+    .profile-avatar {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    .profile-info {
+        text-align: center;
+    }
+    .greeting-section h2 {
+        font-size: 2em;
+    }
+    .details-card h3, .instructions-card h3 {
+        font-size: 1.1em;
+    }
+    .rating-log-list li p {
+        font-size: 0.9em;
+    }
+    .admin-btn-primary, .admin-btn-secondary {
+        font-size: 1em;
+        padding: 10px 20px;
+        width: 90%;
+    }
+}
